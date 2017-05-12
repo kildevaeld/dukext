@@ -35,3 +35,5 @@ fail:
     uv_fs_close(loop, &req, fd, NULL);
   uv_fs_req_cleanup(&req);
 }
+
+void dukext_fs_init(dukext_t *duk) {}

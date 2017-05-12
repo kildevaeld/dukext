@@ -11,360 +11,47 @@
  *  Timer API
  */
 
-function setTimeout(func, delay) {
-    var cb_func;
-    var bind_args;
-    var timer_id;
+(function () {
 
-    if (typeof delay !== 'number') {
-        throw new TypeError('delay is not a number');
-    }
+    function startTimer(func, delay, repeat) {
+        var cb_func;
+        var bind_args;
+        var timer_id;
 
-    if (typeof func === 'string') {
-        // Legacy case: callback is a string.
-        cb_func = eval.bind(this, func);
-    } else if (typeof func !== 'function') {
-        throw new TypeError('callback is not a function/string');
-    } else if (arguments.length > 2) {
-        // Special case: callback arguments are provided.
-        bind_args = Array.prototype.slice.call(arguments, 2); // [ arg1, arg2, ... ]
-        bind_args.unshift(this); // [ global(this), arg1, arg2, ... ]
-        cb_func = func.bind.apply(func, bind_args);
-    } else {
-        // Normal case: callback given as a function without arguments.
-        cb_func = func;
-    }
-
-    timer_id = EventLoop.createTimer();
-    EventLoop.startTimer(timer_id, delay, 0, func)
-    return timer_id;
-}
-
-function clearTimeout(timer_id) {
-    //console.log(typeof timer_id);
-    /*if (typeof timer_id !== 'number') {
-        throw new TypeError('timer ID is not a number');
-    }*/
-    var success = EventLoop.deleteTimer(timer_id); /* retval ignored */
-}
-
-function setInterval(func, delay) {
-    var cb_func;
-    var bind_args;
-    var timer_id;
-
-    if (typeof delay !== 'number') {
-        throw new TypeError('delay is not a number');
-    }
-
-    if (typeof func === 'string') {
-        // Legacy case: callback is a string.
-        cb_func = eval.bind(this, func);
-    } else if (typeof func !== 'function') {
-        throw new TypeError('callback is not a function/string');
-    } else if (arguments.length > 2) {
-        // Special case: callback arguments are provided.
-        bind_args = Array.prototype.slice.call(arguments, 2); // [ arg1, arg2, ... ]
-        bind_args.unshift(this); // [ global(this), arg1, arg2, ... ]
-        cb_func = func.bind.apply(func, bind_args);
-    } else {
-        // Normal case: callback given as a function without arguments.
-        cb_func = func;
-    }
-
-    timer_id = EventLoop.createTimer();
-    EventLoop.startTimer(timer_id, delay, 1, func)
-
-    return timer_id;
-}
-
-function clearInterval(timer_id) {
-    if (typeof timer_id !== 'number') {
-        throw new TypeError('timer ID is not a number');
-    }
-    EventLoop.deleteTimer(timer_id);
-}
-
-
-this.Promise = (function () {
-    //
-    // Polyfill
-    //
-
-    var PENDING = 'pending';
-    var SEALED = 'sealed';
-    var FULFILLED = 'fulfilled';
-    var REJECTED = 'rejected';
-    var NOOP = function () {};
-
-    function isArray(value) {
-        return Object.prototype.toString.call(value) === '[object Array]';
-    }
-
-    // async calls
-    var asyncSetTimer = typeof setImmediate !== 'undefined' ? setImmediate : setTimeout;
-    var asyncQueue = [];
-    var asyncTimer;
-
-    function asyncFlush() {
-        // run promise callbacks
-        for (var i = 0; i < asyncQueue.length; i++)
-            asyncQueue[i][0](asyncQueue[i][1]);
-
-        // reset async asyncQueue
-        asyncQueue = [];
-        asyncTimer = false;
-    }
-
-    function asyncCall(callback, arg) {
-        asyncQueue.push([callback, arg]);
-
-        if (!asyncTimer) {
-            asyncTimer = true;
-            asyncSetTimer(asyncFlush, 0);
-        }
-    }
-
-
-    function invokeResolver(resolver, promise) {
-        function resolvePromise(value) {
-            resolve(promise, value);
+        if (typeof delay !== 'number') {
+            throw new TypeError('delay is not a number');
         }
 
-        function rejectPromise(reason) {
-            reject(promise, reason);
+        if (typeof func === 'string') {
+            // Legacy case: callback is a string.
+            cb_func = eval.bind(this, func);
+        } else if (typeof func !== 'function') {
+            throw new TypeError('callback is not a function/string');
+        } else if (arguments.length > 2) {
+            // Special case: callback arguments are provided.
+            bind_args = Array.prototype.slice.call(arguments, 2); // [ arg1, arg2, ... ]
+            bind_args.unshift(this); // [ global(this), arg1, arg2, ... ]
+            cb_func = func.bind.apply(func, bind_args);
+        } else {
+            // Normal case: callback given as a function without arguments.
+            cb_func = func;
         }
 
-        try {
-            resolver(resolvePromise, rejectPromise);
-        } catch (e) {
-            rejectPromise(e);
-        }
+        timer_id = uv.timerCreate();
+        uv.timerStart(timer_id, delay, repeat, func);
+        return timer_id;
     }
 
-    function invokeCallback(subscriber) {
-        var owner = subscriber.owner;
-        var settled = owner.state_;
-        var value = owner.data_;
-        var callback = subscriber[settled];
-        var promise = subscriber.then;
-
-        if (typeof callback === 'function') {
-            settled = FULFILLED;
-            try {
-                value = callback(value);
-            } catch (e) {
-                reject(promise, e);
-            }
-        }
-
-        if (!handleThenable(promise, value)) {
-            if (settled === FULFILLED)
-                resolve(promise, value);
-
-            if (settled === REJECTED)
-                reject(promise, value);
-        }
+    this.setTimeout = function setTimeout(func, delay) {
+        return startTimer(func, delay, 0);
     }
 
-    function handleThenable(promise, value) {
-        var resolved;
-
-        try {
-            if (promise === value)
-                throw new TypeError('A promises callback cannot return that same promise.');
-
-            if (value && (typeof value === 'function' || typeof value === 'object')) {
-                var then = value.then; // then should be retrived only once
-
-                if (typeof then === 'function') {
-                    then.call(value, function (val) {
-                        if (!resolved) {
-                            resolved = true;
-
-                            if (value !== val)
-                                resolve(promise, val);
-                            else
-                                fulfill(promise, val);
-                        }
-                    }, function (reason) {
-                        if (!resolved) {
-                            resolved = true;
-
-                            reject(promise, reason);
-                        }
-                    });
-
-                    return true;
-                }
-            }
-        } catch (e) {
-            if (!resolved)
-                reject(promise, e);
-
-            return true;
-        }
-
-        return false;
+    this.clearInterval = this.clearTimeout = function clearTimeout(timer_id) {
+        var success = uv.close(timer_id); /* retval ignored */
     }
 
-    function resolve(promise, value) {
-        if (promise === value || !handleThenable(promise, value))
-            fulfill(promise, value);
+    this.setInterval = function setInterval(func, delay) {
+        return startTimer(func, delay, delay);
     }
 
-    function fulfill(promise, value) {
-        if (promise.state_ === PENDING) {
-            promise.state_ = SEALED;
-            promise.data_ = value;
-
-            asyncCall(publishFulfillment, promise);
-        }
-    }
-
-    function reject(promise, reason) {
-        if (promise.state_ === PENDING) {
-            promise.state_ = SEALED;
-            promise.data_ = reason;
-
-            asyncCall(publishRejection, promise);
-        }
-    }
-
-    function publish(promise) {
-        var callbacks = promise.then_;
-        promise.then_ = undefined;
-
-        for (var i = 0; i < callbacks.length; i++) {
-            invokeCallback(callbacks[i]);
-        }
-    }
-
-    function publishFulfillment(promise) {
-        promise.state_ = FULFILLED;
-        publish(promise);
-    }
-
-    function publishRejection(promise) {
-        promise.state_ = REJECTED;
-        publish(promise);
-    }
-
-    /**
-     * @class
-     */
-    function Promise(resolver) {
-        if (typeof resolver !== 'function')
-            throw new TypeError('Promise constructor takes a function argument');
-
-        if (this instanceof Promise === false)
-            throw new TypeError('Failed to construct \'Promise\': Please use the \'new\' operator, this object constructor cannot be called as a function.');
-
-        this.then_ = [];
-
-        invokeResolver(resolver, this);
-    }
-
-    Promise.prototype = {
-        constructor: Promise,
-
-        state_: PENDING,
-        then_: null,
-        data_: undefined,
-
-        then: function (onFulfillment, onRejection) {
-            var subscriber = {
-                owner: this,
-                then: new this.constructor(NOOP),
-                fulfilled: onFulfillment,
-                rejected: onRejection
-            };
-
-            if (this.state_ === FULFILLED || this.state_ === REJECTED) {
-                // already resolved, call callback async
-                asyncCall(invokeCallback, subscriber);
-            } else {
-                // subscribe
-                this.then_.push(subscriber);
-            }
-
-            return subscriber.then;
-        },
-
-        'catch': function (onRejection) {
-            return this.then(null, onRejection);
-        }
-    };
-
-    Promise.all = function (promises) {
-        var Class = this;
-
-        if (!isArray(promises))
-            throw new TypeError('You must pass an array to Promise.all().');
-
-        return new Class(function (resolve, reject) {
-            var results = [];
-            var remaining = 0;
-
-            function resolver(index) {
-                remaining++;
-                return function (value) {
-                    results[index] = value;
-                    if (!--remaining)
-                        resolve(results);
-                };
-            }
-
-            for (var i = 0, promise; i < promises.length; i++) {
-                promise = promises[i];
-
-                if (promise && typeof promise.then === 'function')
-                    promise.then(resolver(i), reject);
-                else
-                    results[i] = promise;
-            }
-
-            if (!remaining)
-                resolve(results);
-        });
-    };
-
-    Promise.race = function (promises) {
-        var Class = this;
-
-        if (!isArray(promises))
-            throw new TypeError('You must pass an array to Promise.race().');
-
-        return new Class(function (resolve, reject) {
-            for (var i = 0, promise; i < promises.length; i++) {
-                promise = promises[i];
-
-                if (promise && typeof promise.then === 'function')
-                    promise.then(resolve, reject);
-                else
-                    resolve(promise);
-            }
-        });
-    };
-
-    Promise.resolve = function (value) {
-        var Class = this;
-
-        if (value && typeof value === 'object' && value.constructor === Class)
-            return value;
-
-        return new Class(function (resolve) {
-            resolve(value);
-        });
-    };
-
-    Promise.reject = function (reason) {
-        var Class = this;
-
-        return new Class(function (resolve, reject) {
-            reject(reason);
-        });
-    };
-
-    return Promise;
 })();

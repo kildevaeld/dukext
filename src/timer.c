@@ -3,7 +3,7 @@
 #include "dschema.h"
 #include "dschema_uv.h"
 #include "refs.h"
-#include "timers_data.h"
+//#include "timers_data.h"
 #include "utils.h"
 #define MAX_TIMERS                                                             \
   4096 /* this is quite excessive for embedded use, but good for testing */
@@ -12,7 +12,7 @@
 #define MAX_WAIT 60000.0
 #define MAX_EXPIRYS 10
 
-static duk_ret_t create_timer(duk_context *ctx) {
+duk_ret_t dukext_timer_create(duk_context *ctx) {
   uv_timer_t *handle;
 
   dschema_check(ctx, (const dukext_schema_entry[]){{NULL}});
@@ -25,7 +25,7 @@ static duk_ret_t create_timer(duk_context *ctx) {
   return 1;
 }
 
-static duk_ret_t start_timer(duk_context *ctx) {
+duk_ret_t dukext_timer_start(duk_context *ctx) {
   uv_timer_t *handle;
   uint64_t timeout;
   uint64_t repeat;
@@ -46,7 +46,7 @@ static duk_ret_t start_timer(duk_context *ctx) {
   return 0;
 }
 
-duk_ret_t delete_timer(duk_context *ctx) {
+duk_ret_t dukext_timer_stop(duk_context *ctx) {
 
   uv_timer_t *handle;
 
@@ -58,16 +58,38 @@ duk_ret_t delete_timer(duk_context *ctx) {
   return 0;
 }
 
-static duk_function_list_entry eventloop_funcs[] = {
-    {"createTimer", create_timer, 0},
-    {"startTimer", start_timer, 4},
-    {"deleteTimer", delete_timer, 1},
-    //{ "listenFd", listen_fd, 2 },
-    //{ "requestExit", request_exit, 0 },
-    {NULL, NULL, 0}};
+duk_ret_t dukext_async_create(duk_context *ctx) {
+  uv_async_t *handle;
+
+  dschema_check(ctx, (const dukext_schema_entry[]){
+                         {"ontimeout", duk_is_function}, {NULL}});
+
+  handle = duk_push_fixed_buffer(ctx, sizeof(*handle));
+
+  dukext_check(ctx, uv_async_init(dukext_loop(ctx), handle, dukext_async_cb));
+  handle->data = dukext_setup_handle(ctx);
+
+  // duk_pop(ctx);
+  dukext_store_handler(ctx, handle->data, DUKEXT_TIMEOUT, -2);
+
+  dukext_check(ctx, uv_async_send(handle));
+
+  return 1;
+}
+duk_ret_t dukext_async_start(duk_context *ctx) {
+
+  uv_timer_t *handle;
+
+  dschema_check(
+      ctx, (const dukext_schema_entry[]){{"timer", dukext_is_async}, {NULL}});
+
+  handle = duk_get_buffer(ctx, 0, NULL);
+
+    return 0;
+}
 
 void dukext_timer_init(duk_context *ctx) {
-  duk_push_global_object(ctx);
+  /*duk_push_global_object(ctx);
   duk_push_object(ctx);
 
   duk_put_function_list(ctx, -1, eventloop_funcs);
@@ -75,7 +97,7 @@ void dukext_timer_init(duk_context *ctx) {
 
   duk_push_string(ctx, (const char *)timers_js);
   duk_eval(ctx);
-  duk_pop(ctx);
+  duk_pop(ctx);*/
 }
 
 void dukext_timer_cleanup(duk_context *ctx) {

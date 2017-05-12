@@ -10,6 +10,8 @@ duk_bool_t dukext_is_req(duk_context *ctx, duk_idx_t index);
 duk_bool_t dukext_is_fs(duk_context *ctx, duk_idx_t index);
 duk_bool_t dukext_is_stream(duk_context *ctx, duk_idx_t index);
 duk_bool_t dukext_is_timer(duk_context *ctx, duk_idx_t index);
+duk_bool_t dukext_is_async(duk_context *ctx, duk_idx_t index);
+
 duk_bool_t dukext_is_tcp(duk_context *ctx, duk_idx_t index);
 duk_bool_t dukext_is_pipe(duk_context *ctx, duk_idx_t index);
 duk_bool_t dukext_is_tty(duk_context *ctx, duk_idx_t index);

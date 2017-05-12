@@ -10,6 +10,10 @@ set(SOURCES
     refs.c
     callbacks.c
     fs.c
+    handle.c
+    req.c
+    tty.c
+    stream.c
 )
 
 

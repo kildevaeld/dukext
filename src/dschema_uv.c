@@ -45,6 +45,16 @@ duk_bool_t dukext_is_timer(duk_context *ctx, duk_idx_t index) {
   return size == sizeof(*handle) && handle->type == UV_TIMER;
 }
 
+duk_bool_t dukext_is_async(duk_context *ctx, duk_idx_t index) {
+  uv_async_t *handle;
+  duk_size_t size;
+  if (!duk_is_fixed_buffer(ctx, index))
+    return 0;
+  handle = duk_get_buffer(ctx, index, &size);
+  // TODO: find safer check than size to verify struct type
+  return size == sizeof(*handle) && handle->type == UV_ASYNC;
+}
+
 duk_bool_t dukext_is_tcp(duk_context *ctx, duk_idx_t index) {
   uv_tcp_t *handle;
   duk_size_t size;

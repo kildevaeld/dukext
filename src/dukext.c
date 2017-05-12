@@ -1,9 +1,18 @@
 #include "dukext.h"
 #include "console/duk_console.h"
 #include "duktape.h"
+#include "fs.h"
+#include "handle.h"
 #include "module-node/duk_module_node.h"
+#include "prelude.h"
+
 #include "refs.h"
+#include "req.h"
+#include "stream.h"
 #include "timer.h"
+#include "timers_data.h"
+#include "tty.h"
+
 //#include "module.h"
 extern duk_ret_t cb_resolve_module(duk_context *ctx);
 extern duk_ret_t cb_load_module(duk_context *ctx);
@@ -18,15 +27,61 @@ static void init_modules(dukext_t *req) {
   duk_module_node_init(ctx);
 }
 
+static const duk_function_list_entry dukext_funcs[] = {
+
+    // req.c
+    {"cancel", dukext_cancel, 1},
+
+    // handle.c
+    {"close", dukext_close, 2},
+
+    {"timerCreate", dukext_timer_create, 0},
+    {"timerStart", dukext_timer_start, 4},
+    {"timerStop", dukext_timer_stop, 1},
+    {"async", dukext_async_create, 1},
+
+    // stream.c
+    {"shutdown", dukext_shutdown, 2},
+    {"listen", dukext_listen, 3},
+    {"accept", dukext_accept, 2},
+    {"read_start", dukext_read_start, 2},
+    {"read_stop", dukext_read_stop, 1},
+    {"write", dukext_write, 3},
+    {"is_readable", dukext_is_readable, 1},
+    {"is_writable", dukext_is_writable, 1},
+    {"stream_set_blocking", dukext_stream_set_blocking, 2},
+
+    // tty
+    {"ttyCreate", dukext_new_tty, 2},
+    {"ttySetMode", dukext_tty_set_mode, 2},
+    {"ttyRestMode", dukext_tty_reset_mode, 0},
+    {"ttyGetWinSize", dukext_tty_get_winsize, 1},
+    {NULL, NULL, 0}};
+
+static void init_globals(duk_context *ctx) {
+  duk_push_global_object(ctx);
+  duk_push_object(ctx);
+  duk_put_function_list(ctx, -1, dukext_funcs);
+  duk_put_prop_string(ctx, -2, "uv");
+  duk_push_string(ctx, (const char *)timers_js);
+  duk_eval(ctx);
+  duk_pop(ctx);
+  duk_push_lstring(ctx, (const char *)prelude_js, prelude_js_len);
+  duk_eval(ctx);
+  duk_pop(ctx);
+}
+
 int dukext_init(dukext_t *req, uv_loop_t *loop) {
   req->ctx = duk_create_heap(NULL, NULL, NULL, loop, NULL);
   req->loop = loop;
   dukext_ref_setup(req->ctx);
 
   duk_console_init(req->ctx, DUK_CONSOLE_PROXY_WRAPPER);
-  dukext_timer_init(req->ctx);
-
+  // dukext_timer_init(req->ctx);
+  // dukext_fs_init(req);
   init_modules(req);
+
+  init_globals(req->ctx);
 
   return 0;
 }
