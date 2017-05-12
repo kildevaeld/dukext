@@ -2,6 +2,8 @@
 #include "utils.h"
 #include "uv.h"
 
+#include "events_data.h"
+
 extern duk_ret_t cb_resolve_module(duk_context *ctx) {
   const char *module_id;
   const char *parent_id;
@@ -25,6 +27,12 @@ extern duk_ret_t cb_load_module(duk_context *ctx) {
   filename = duk_require_string(ctx, -1);
 
   printf("load_cb: id:'%s', filename:'%s'\n", module_id, filename);
+
+  if (strcmp(module_id, "events.js") == 0) {
+    duk_push_lstring(ctx, (const char *)events_js, events_js_len);
+
+    return 1;
+  }
 
   const char *path = filename; // duk_require_string(ctx, 0);
   uv_fs_t req;

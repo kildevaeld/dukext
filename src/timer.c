@@ -18,6 +18,7 @@ static duk_ret_t create_timer(duk_context *ctx) {
   dschema_check(ctx, (const dukext_schema_entry[]){{NULL}});
 
   handle = duk_push_fixed_buffer(ctx, sizeof(*handle));
+
   dukext_check(ctx, uv_timer_init(dukext_loop(ctx), handle));
   handle->data = dukext_setup_handle(ctx);
 
@@ -93,13 +94,13 @@ void dukext_timer_cleanup(duk_context *ctx) {
 
       dukext_check(ctx, uv_timer_stop(handle));
 
-      duk_dup(ctx, -4);
+      duk_dup(ctx, -4);                       // refs
       duk_get_prop_string(ctx, -1, "splice"); // load arr.splice onto stack
       duk_dup(ctx, -2);                       // this
       duk_push_string(ctx, key);              // start
       duk_push_int(ctx, 1);                   // deleteCount
       duk_call_method(ctx, 2);                // nargs = 3
-      duk_pop_2(ctx);                         // retval
+      duk_pop_2(ctx);                         // retval+refs
     }
 
     duk_pop_2(ctx); // pop_key and value

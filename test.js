@@ -1,3 +1,11 @@
+const EventEmitter = require('events').EventEmitter;
+
+var e = new EventEmitter();
+
+e.on('test', function (a) {
+    console.log('Got: ', a);
+});
+
 var promise = new Promise(function (resolve, reject) {
     setTimeout(function () {
         resolve('World');
@@ -9,5 +17,5 @@ promise.then(function (what) {
 });
 
 var timer = setTimeout(function () {
-    throw new Error('dssds')
-}, 2000);
+    e.emit('test', 'Hello, World');
+}, 1000);
