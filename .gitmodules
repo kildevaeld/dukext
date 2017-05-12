@@ -1,0 +1,6 @@
+[submodule "libs/duktape"]
+	path = libs/duktape
+	url = https://github.com/svaarala/duktape-releases.git
+[submodule "libs/uvext"]
+	path = libs/uvext
+	url = https://github.com/kildevaeld/uvext
