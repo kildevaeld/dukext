@@ -22,4 +22,7 @@ void dukext_emit_event(duk_context *ctx, dukext_handle_t *data,
 
 int dukext_push_status(duk_context *ctx, int status);
 void dukext_get_data(duk_context *ctx, int index, uv_buf_t *buf);
+
+const char *dukext_protocol_to_string(int family);
+
 #endif

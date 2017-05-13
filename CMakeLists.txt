@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(dukext)
 
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Os -fomit-frame-pointer -fstrict-aliasing")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Os -fomit-frame-pointer -fstrict-aliasing")
 
 
 set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
@@ -35,4 +35,4 @@ endif(${DUKEXT_CRYPTO})
 
 add_subdirectory(src)
 include_directories(src)
-add_subdirectory(example)
+add_subdirectory(duke)

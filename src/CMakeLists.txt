@@ -14,6 +14,9 @@ set(SOURCES
     req.c
     tty.c
     stream.c
+    tcp.c
+    pipe.c
+    http.c
 )
 
 set(LIBRARIES duktape uvext)

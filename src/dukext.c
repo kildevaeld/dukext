@@ -5,10 +5,11 @@
 #include "handle.h"
 #include "module-node/duk_module_node.h"
 
-#include "crypto.h"
+#include "pipe.h"
 #include "refs.h"
 #include "req.h"
 #include "stream.h"
+#include "tcp.h"
 #include "timer.h"
 #include "tty.h"
 
@@ -66,9 +67,26 @@ static const duk_function_list_entry dukext_funcs[] = {
     {"ttyRestMode", dukext_tty_reset_mode, 0},
     {"ttyGetWinSize", dukext_tty_get_winsize, 1},
 
-    /*{"createHash", dukext_crypto_hash_create, 1},
-    {"updateHash", dukext_crypto_hash_update, 2},
-    {"digestHash", dukext_crypto_hash_digest, 1},*/
+    // tcp.c
+    {"new_tcp", dukext_new_tcp, 0},
+    {"tcp_open", dukext_tcp_open, 2},
+    {"tcp_nodelay", dukext_tcp_nodelay, 2},
+    {"tcp_keepalive", dukext_tcp_keepalive, 3},
+    {"tcp_simultaneous_accepts", dukext_tcp_simultaneous_accepts, 2},
+    {"tcp_bind", dukext_tcp_bind, 3},
+    {"tcp_getpeername", dukext_tcp_getpeername, 1},
+    {"tcp_getsockname", dukext_tcp_getsockname, 1},
+    {"tcp_connect", dukext_tcp_connect, 4},
+
+    // pipe.c
+    {"new_pipe", dukext_new_pipe, 1},
+    {"pipe_open", dukext_pipe_open, 2},
+    {"pipe_bind", dukext_pipe_bind, 2},
+    {"pipe_connect", dukext_pipe_connect, 3},
+    {"pipe_getsockname", dukext_pipe_getsockname, 1},
+    {"pipe_pending_instances", dukext_pipe_pending_instances, 2},
+    {"pipe_pending_count", dukext_pipe_pending_count, 1},
+    {"pipe_pending_type", dukext_pipe_pending_type, 1},
 
     {NULL, NULL, 0}};
 

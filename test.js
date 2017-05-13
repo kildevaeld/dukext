@@ -55,9 +55,17 @@ var out = crypto.digest(hash);
 console.log(Duktape.enc('hex', out))
 crypto.clean(hash);*/
 /**/
-const crypto = require('crypto');
+/*const crypto = require('crypto');
 var out = crypto.createHash('sha256').update('Hello, World').digest()
-console.log(out)
+console.log(out)*/
+
+const crypto = require('crypto');
+
+console.log('Sha256: ', crypto.createHash('sha256').update('Hello, World').digest())
+
+setTimeout(function () {
+    console.log('Hello')
+}, 5000)
 
 
 //process.stdin.close();

@@ -136,6 +136,7 @@ int dukext_push_status(duk_context *ctx, int status) {
   duk_push_null(ctx);
   return 0;
 }
+
 void dukext_get_data(duk_context *ctx, int index, uv_buf_t *buf) {
   duk_size_t len;
   if (duk_is_string(ctx, index)) {
@@ -144,4 +145,48 @@ void dukext_get_data(duk_context *ctx, int index, uv_buf_t *buf) {
     buf->base = duk_get_buffer(ctx, index, &len);
   }
   buf->len = len;
+}
+
+const char *dukext_protocol_to_string(int family) {
+#ifdef AF_UNIX
+  if (family == AF_UNIX)
+    return "UNIX";
+#endif
+#ifdef AF_INET
+  if (family == AF_INET)
+    return "INET";
+#endif
+#ifdef AF_INET6
+  if (family == AF_INET6)
+    return "INET6";
+#endif
+#ifdef AF_IPX
+  if (family == AF_IPX)
+    return "IPX";
+#endif
+#ifdef AF_NETLINK
+  if (family == AF_NETLINK)
+    return "NETLINK";
+#endif
+#ifdef AF_X25
+  if (family == AF_X25)
+    return "X25";
+#endif
+#ifdef AF_AX25
+  if (family == AF_AX25)
+    return "AX25";
+#endif
+#ifdef AF_ATMPVC
+  if (family == AF_ATMPVC)
+    return "ATMPVC";
+#endif
+#ifdef AF_APPLETALK
+  if (family == AF_APPLETALK)
+    return "APPLETALK";
+#endif
+#ifdef AF_PACKET
+  if (family == AF_PACKET)
+    return "PACKET";
+#endif
+  return NULL;
 }
