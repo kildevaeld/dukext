@@ -1,1 +1,0 @@
-!function(){function Stream(handle){this._h=handle}require("events").EventEmitter;var proto=Stream.prototype;proto.read=function(){uv.read_start(this._h,function(){console.log("read")})},proto.write=function(){uv.write_start(this._h,function(){console.log("write")})},proto.close=function(){uv.close()},this.Stream=Stream,this.process={version:Duktape.version}}();

@@ -1,4 +1,4 @@
-this.Promise = (function () {
+(function () {
     //
     // Polyfill
     //
@@ -165,7 +165,7 @@ this.Promise = (function () {
     /**
      * @class
      */
-    function Promise(resolver) {
+    this.Promise = function Promise(resolver) {
         if (typeof resolver !== 'function')
             throw new TypeError('Promise constructor takes a function argument');
 

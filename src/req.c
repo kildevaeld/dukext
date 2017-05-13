@@ -1,6 +1,7 @@
 #include "req.h"
 #include "dschema.h"
 #include "dschema_uv.h"
+#include "utils.h"
 
 duk_ret_t dukext_cancel(duk_context *ctx) {
   uv_req_t *req;

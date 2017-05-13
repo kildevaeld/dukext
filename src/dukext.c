@@ -4,18 +4,24 @@
 #include "fs.h"
 #include "handle.h"
 #include "module-node/duk_module_node.h"
-#include "prelude.h"
 
 #include "refs.h"
 #include "req.h"
 #include "stream.h"
 #include "timer.h"
-#include "timers_data.h"
 #include "tty.h"
 
-//#include "module.h"
 extern duk_ret_t cb_resolve_module(duk_context *ctx);
 extern duk_ret_t cb_load_module(duk_context *ctx);
+
+extern unsigned char prelude_js[];
+extern unsigned int prelude_js_len;
+
+extern unsigned char promise_js[];
+extern unsigned int promise_js_len;
+
+extern unsigned char timers_js[];
+extern unsigned int timers_js_len;
 
 static void init_modules(dukext_t *req) {
   duk_context *ctx = req->ctx;

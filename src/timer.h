@@ -3,8 +3,6 @@
 
 #include "dukext.h"
 
-void dukext_timer_init(duk_context *ctx);
-
 duk_ret_t dukext_timer_create(duk_context *ctx);
 duk_ret_t dukext_timer_start(duk_context *ctx);
 duk_ret_t dukext_timer_stop(duk_context *ctx);

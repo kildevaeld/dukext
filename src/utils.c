@@ -61,6 +61,7 @@ dukext_req_t *dukext_setup_req(duk_context *ctx, int callback_index) {
   }
   data->data_ref = 0;
   data->data = NULL;
+  data->ctx = ctx;
   return data;
 }
 dukext_req_t *dukext_cleanup_req(duk_context *ctx, dukext_req_t *data) {

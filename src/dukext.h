@@ -36,6 +36,7 @@ typedef struct {
   int callback_ref; // ref for callback
   int data_ref;
   void *data; // extra data
+  duk_context *ctx;
 } dukext_req_t;
 
 struct dukext_s {

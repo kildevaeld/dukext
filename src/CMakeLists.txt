@@ -14,6 +14,7 @@ set(SOURCES
     req.c
     tty.c
     stream.c
+    module_data.c
 )
 
 

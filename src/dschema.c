@@ -1,4 +1,5 @@
 #include "dschema.h"
+#include "duk-v1-compat/duk_v1_compat.h"
 
 duk_bool_t dschema_is_data(duk_context *ctx, duk_idx_t index) {
   return duk_is_string(ctx, index) || duk_is_buffer(ctx, index);
@@ -16,12 +17,12 @@ void dschema_check(duk_context *ctx, const dukext_schema_entry schema[]) {
     // printf("Checking arg %d-%s\n", i, schema[i].name);
     if (schema[i].checker(ctx, i))
       continue;
-    // duk_dump_context_stderr(ctx);
+    duk_dump_context_stderr(ctx);
     duk_error(ctx, DUK_ERR_TYPE_ERROR, "Invalid argument type for %s",
               schema[i].name);
   }
   if (top > i) {
-    // duk_dump_context_stderr(ctx);
+    duk_dump_context_stderr(ctx);
     duk_error(ctx, DUK_ERR_TYPE_ERROR,
               "Too many arguments. Expected at %d, but got %d", i, top);
   }

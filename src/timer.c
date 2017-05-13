@@ -85,19 +85,7 @@ duk_ret_t dukext_async_start(duk_context *ctx) {
 
   handle = duk_get_buffer(ctx, 0, NULL);
 
-    return 0;
-}
-
-void dukext_timer_init(duk_context *ctx) {
-  /*duk_push_global_object(ctx);
-  duk_push_object(ctx);
-
-  duk_put_function_list(ctx, -1, eventloop_funcs);
-  duk_put_prop_string(ctx, -2, "EventLoop");
-
-  duk_push_string(ctx, (const char *)timers_js);
-  duk_eval(ctx);
-  duk_pop(ctx);*/
+  return 0;
 }
 
 void dukext_timer_cleanup(duk_context *ctx) {
