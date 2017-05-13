@@ -29,7 +29,7 @@ duk_ret_t dukext_crypto_hash_create(duk_context *ctx);
 duk_ret_t dukext_crypto_hash_update(duk_context *ctx);
 duk_ret_t dukext_crypto_hash_digest(duk_context *ctx);
 
-void dukext_crypto_init(duk_context *ctx);
+duk_ret_t dukext_crypto_init(duk_context *ctx);
 
 #ifdef __cplusplus
 }

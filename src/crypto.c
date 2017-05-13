@@ -1,6 +1,7 @@
 #include "crypto.h"
 
 #include "dschema.h"
+#include "duk-v1-compat/duk_v1_compat.h"
 #include <openssl/md5.h>
 #include <openssl/sha.h>
 
@@ -108,7 +109,7 @@ duk_ret_t dukext_crypto_hash_update(duk_context *ctx) {
   void *str = duk_get_buffer_data(ctx, 1, &size);
 
   if (!update_hash(handle, str, size)) {
-    duk_error(ctx, "crypto: unknown error");
+    duk_error(ctx, 1, "crypto: unknown error");
   }
 
   return 0;
@@ -127,4 +128,26 @@ duk_ret_t dukext_crypto_hash_digest(duk_context *ctx) {
   return 1;
 }
 
-void dukext_crypto_init(duk_context *ctx) {}
+static const duk_function_list_entry dukext_funcs[] = {
+
+    {"createHash", dukext_crypto_hash_create, 1},
+    {"updateHash", dukext_crypto_hash_update, 2},
+    {"digestHash", dukext_crypto_hash_digest, 1},
+
+    {NULL, NULL, 0}};
+
+duk_ret_t dukext_crypto_init(duk_context *ctx) {
+
+  duk_idx_t index = duk_normalize_index(ctx, -2);
+
+  duk_get_prop_string(ctx, index, "exports");
+  duk_push_object(ctx);
+  duk_put_function_list(ctx, -1, dukext_funcs);
+
+  duk_put_prop_string(ctx, -2, "crypto");
+  duk_pop(ctx);
+  duk_dump_context_stderr(ctx);
+
+  duk_push_undefined(ctx);
+  return 1;
+}

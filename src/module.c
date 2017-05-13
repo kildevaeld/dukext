@@ -1,3 +1,4 @@
+#include "crypto.h"
 #include "duktape.h"
 #include "utils.h"
 #include "uv.h"
@@ -52,6 +53,8 @@ extern duk_ret_t cb_load_module(duk_context *ctx) {
   } else if (strcmp(module_id, "stream.js") == 0) {
     duk_push_lstring(ctx, (const char *)stream_js, stream_js_len);
     return 1;
+  } else if (strcmp(module_id, "crypto.js") == 0) {
+    return dukext_crypto_init(ctx);
   }
 
   const char *path = filename; // duk_require_string(ctx, 0);

@@ -36,6 +36,8 @@ process.stdin.on('data', function (data) {
     console.log('data', data)
 })
 
+var crypto = require('crypto');
+console.log(crypto)
 var hash = uv.createHash('sha512');
 
 uv.updateHash(hash, new Buffer("hello, world!"));
