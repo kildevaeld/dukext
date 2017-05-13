@@ -15,12 +15,9 @@ extern "C" {
 
 typedef struct dukext_crypto_hash_s {
   int type;
-  union {
-    MD5_CTX *md5;
-    SHA_CTX *sha;
-    SHA256_CTX *sha256;
-    SHA512_CTX *sha512;
-  };
+  void *hash;
+  int hash_ref;
+  int ref;
 } dukext_crypto_hash_t;
 
 duk_bool_t dukext_crypto_is_hash(duk_context *ctx, duk_idx_t index);
@@ -28,6 +25,7 @@ duk_bool_t dukext_crypto_is_hash(duk_context *ctx, duk_idx_t index);
 duk_ret_t dukext_crypto_hash_create(duk_context *ctx);
 duk_ret_t dukext_crypto_hash_update(duk_context *ctx);
 duk_ret_t dukext_crypto_hash_digest(duk_context *ctx);
+duk_ret_t dukext_crypto_hash_cleanup(duk_context *ctx);
 
 duk_ret_t dukext_crypto_init(duk_context *ctx);
 

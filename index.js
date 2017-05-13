@@ -10,7 +10,8 @@ const files = [
     "event-emitter",
     "prelude",
     "promise",
-    "timers"
+    "timers",
+    "crypto"
 ];
 
 function fileToHexArray(file) {

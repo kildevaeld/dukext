@@ -14,10 +14,18 @@ set(SOURCES
     req.c
     tty.c
     stream.c
-    module_data.c
-    crypto.c
 )
 
+set(LIBRARIES duktape uvext)
+
+if(${DUKEXT_CRYPTO})
+    set(SOURCES ${SOURCES} crypto.c)
+    set(LIBRARIES ${LIBRARIES} ssl crypto)
+endif(${DUKEXT_CRYPTO})
+
+if (${DUKEXT_NODE_COMPAT})
+    set(SOURCES ${SOURCES} module_data.c)
+endif(${DUKEXT_NODE_COMPAT})
 
 add_library(dukext ${SOURCES})
-target_link_libraries(dukext duktape uvext ssl crypto)
+target_link_libraries(dukext ${LIBRARIES})

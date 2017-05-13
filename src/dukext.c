@@ -15,6 +15,7 @@
 extern duk_ret_t cb_resolve_module(duk_context *ctx);
 extern duk_ret_t cb_load_module(duk_context *ctx);
 
+#ifdef DUKEXT_NODE_COMPAT
 extern unsigned char prelude_js[];
 extern unsigned int prelude_js_len;
 
@@ -23,6 +24,7 @@ extern unsigned int promise_js_len;
 
 extern unsigned char timers_js[];
 extern unsigned int timers_js_len;
+#endif
 
 static void init_modules(dukext_t *req) {
   duk_context *ctx = req->ctx;
@@ -64,9 +66,9 @@ static const duk_function_list_entry dukext_funcs[] = {
     {"ttyRestMode", dukext_tty_reset_mode, 0},
     {"ttyGetWinSize", dukext_tty_get_winsize, 1},
 
-    {"createHash", dukext_crypto_hash_create, 1},
+    /*{"createHash", dukext_crypto_hash_create, 1},
     {"updateHash", dukext_crypto_hash_update, 2},
-    {"digestHash", dukext_crypto_hash_digest, 1},
+    {"digestHash", dukext_crypto_hash_digest, 1},*/
 
     {NULL, NULL, 0}};
 
@@ -75,12 +77,14 @@ static void init_globals(duk_context *ctx) {
   duk_push_object(ctx);
   duk_put_function_list(ctx, -1, dukext_funcs);
   duk_put_prop_string(ctx, -2, "uv");
+#ifdef DUKEXT_NODE_COMPAT
   duk_push_string(ctx, (const char *)timers_js);
   duk_eval(ctx);
   duk_pop(ctx);
   duk_push_lstring(ctx, (const char *)prelude_js, prelude_js_len);
   duk_eval(ctx);
   duk_pop(ctx);
+#endif
 }
 
 int dukext_init(dukext_t *req, uv_loop_t *loop) {

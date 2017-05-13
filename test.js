@@ -1,12 +1,12 @@
-var EventEmitter = require('events').EventEmitter
+/*var EventEmitter = require('events').EventEmitter
 
 var e = new EventEmitter();
 
 
 e.once('event', function (w) {
     console.log('Hello, ', w);
-});
-
+});*/
+/*
 var i = setInterval(function () {
     console.log('interval');
     e.emit('event', 'World!');
@@ -14,7 +14,7 @@ var i = setInterval(function () {
 
 setTimeout(function () {
     clearInterval(i);
-}, 3000);
+}, 1200);*/
 /*
 function fib(n) {
     if (n < 2) return n;
@@ -24,29 +24,41 @@ function fib(n) {
 console.log(fib(35));*/
 
 
-
+/*
 setTimeout(function () {
     console.log('Time Hello')
 
 }, 1000)
+*/
 
-
-process.stdin.on('data', function (data) {
-
-    console.log('data', data)
-})
+/*
 
 var crypto = require('crypto');
-console.log(crypto)
-var hash = uv.createHash('sha512');
 
-uv.updateHash(hash, new Buffer("hello, world!"));
+var hash = crypto.createHash('sha256').update("Hello, World").digest('hex');
 
-var buf = uv.digestHash(hash);
+console.log('rapper', hash);
 
 
+setTimeout(function () {
+    console.log('hello');
+}, 2000)
+*/
+/*
+const crypto = require('crypto');
 
-console.log(Duktape.enc('hex', buf));
+require('crypto');
+var hash = crypto.create('sha256');
+
+crypto.update(hash, new Buffer('Hello, World'));
+var out = crypto.digest(hash);
+console.log(Duktape.enc('hex', out))
+crypto.clean(hash);*/
+/**/
+const crypto = require('crypto');
+var out = crypto.createHash('sha256').update('Hello, World').digest()
+console.log(out)
+
 
 //process.stdin.close();
 

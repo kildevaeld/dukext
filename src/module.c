@@ -1,8 +1,13 @@
-#include "crypto.h"
+#include "debug.h"
 #include "duktape.h"
 #include "utils.h"
 #include "uv.h"
 
+#ifdef DUKEXT_CRYPTO
+#include "crypto.h"
+#endif
+
+#ifdef DUKEXT_NODE_COMPAT
 extern unsigned char event_emitter_js[];
 extern unsigned int event_emitter_js_len;
 extern unsigned char net_js[];
@@ -13,6 +18,7 @@ extern unsigned char tty_js[];
 extern unsigned int tty_js_len;
 extern unsigned char stream_js[];
 extern unsigned int stream_js_len;
+#endif
 
 extern duk_ret_t cb_resolve_module(duk_context *ctx) {
   const char *module_id;
@@ -22,8 +28,8 @@ extern duk_ret_t cb_resolve_module(duk_context *ctx) {
   parent_id = duk_require_string(ctx, 1);
 
   duk_push_sprintf(ctx, "%s.js", module_id);
-  printf("resolve_cb: id:'%s', parent-id:'%s', resolve-to:'%s'\n", module_id,
-         parent_id, duk_get_string(ctx, -1));
+  debug("resolve_cb: id:'%s', parent-id:'%s', resolve-to:'%s'\n", module_id,
+        parent_id, duk_get_string(ctx, -1));
 
   return 1;
 }
@@ -36,7 +42,9 @@ extern duk_ret_t cb_load_module(duk_context *ctx) {
   duk_get_prop_string(ctx, 2, "filename");
   filename = duk_require_string(ctx, -1);
 
-  printf("load_cb: id:'%s', filename:'%s'\n", module_id, filename);
+  debug("load_cb: id:'%s', filename:'%s'\n", module_id, filename);
+
+#ifdef DUKEXT_NODE_COMPAT
 
   if (strcmp(module_id, "events.js") == 0) {
     duk_push_lstring(ctx, (const char *)event_emitter_js, event_emitter_js_len);
@@ -53,9 +61,14 @@ extern duk_ret_t cb_load_module(duk_context *ctx) {
   } else if (strcmp(module_id, "stream.js") == 0) {
     duk_push_lstring(ctx, (const char *)stream_js, stream_js_len);
     return 1;
-  } else if (strcmp(module_id, "crypto.js") == 0) {
+  }
+#endif
+
+#ifdef DUKEXT_CRYPTO
+  if (strcmp(module_id, "crypto.js") == 0) {
     return dukext_crypto_init(ctx);
   }
+#endif
 
   const char *path = filename; // duk_require_string(ctx, 0);
   uv_fs_t req;
