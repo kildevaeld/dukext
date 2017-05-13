@@ -15,8 +15,9 @@ set(SOURCES
     tty.c
     stream.c
     module_data.c
+    crypto.c
 )
 
 
 add_library(dukext ${SOURCES})
-target_link_libraries(dukext duktape uvext)
+target_link_libraries(dukext duktape uvext ssl crypto)

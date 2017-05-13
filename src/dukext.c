@@ -5,6 +5,7 @@
 #include "handle.h"
 #include "module-node/duk_module_node.h"
 
+#include "crypto.h"
 #include "refs.h"
 #include "req.h"
 #include "stream.h"
@@ -62,6 +63,11 @@ static const duk_function_list_entry dukext_funcs[] = {
     {"ttySetMode", dukext_tty_set_mode, 2},
     {"ttyRestMode", dukext_tty_reset_mode, 0},
     {"ttyGetWinSize", dukext_tty_get_winsize, 1},
+
+    {"createHash", dukext_crypto_hash_create, 1},
+    {"updateHash", dukext_crypto_hash_update, 2},
+    {"digestHash", dukext_crypto_hash_digest, 1},
+
     {NULL, NULL, 0}};
 
 static void init_globals(duk_context *ctx) {

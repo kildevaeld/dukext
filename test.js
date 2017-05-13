@@ -36,6 +36,16 @@ process.stdin.on('data', function (data) {
     console.log('data', data)
 })
 
+var hash = uv.createHash('sha512');
+
+uv.updateHash(hash, new Buffer("hello, world!"));
+
+var buf = uv.digestHash(hash);
+
+
+
+console.log(Duktape.enc('hex', buf));
+
 //process.stdin.close();
 
 //console.log(process.stdout.write);

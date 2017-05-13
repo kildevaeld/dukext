@@ -10,6 +10,7 @@ include(cmake/duktape.cmake)
 
 add_subdirectory(libs/uvext)
 include_directories(${PROJECT_ROOT}/libs/uvext/src)
+include_directories(${PROJECT_ROOT}/libs/uvext/libs/boringssl/include)
 
 add_subdirectory(src)
 include_directories(src)
