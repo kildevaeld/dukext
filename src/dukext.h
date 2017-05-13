@@ -1,6 +1,10 @@
 #ifndef DUKEXT_DUKEXT_H
 #define DUKEXT_DUKEXT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "duktape.h"
 #include "uv.h"
 
@@ -51,5 +55,9 @@ int dukext_init(dukext_t *req, uv_loop_t *loop);
 duk_ret_t dukext_run(dukext_t *req, const char *source);
 
 void dukext_cleanup(dukext_t *req);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
